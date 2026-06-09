@@ -477,12 +477,23 @@ class LoadImagesAndLabels(Dataset):  # for training/testing
         for i, (im_file, lb_file) in enumerate(pbar):
             try:
                 # verify images
-                im = Image.open(im_file)
-                im.verify()  # PIL verify
-                shape = exif_size(im)  # image size
-                segments = []  # instance segments
-                assert (shape[0] > 9) & (shape[1] > 9), f'image size {shape} <10 pixels'
-                assert im.format.lower() in img_formats, f'invalid image format {im.format}'
+                if im_file.endswith(".npy"):
+                    im = np.load(im_file)
+                    assert im.ndim == 3, \
+                        f"invalid npy shape {im.shape}"
+                    assert im.shape[2] == 5, \
+                        f"expected 5 channles got {im.shape}"
+                    shape = (
+                        im.shape[1],
+                        im.shape[0]
+                    )
+                else:
+                    im = Image.open(im_file)
+                    im.verify()  # PIL verify
+                    shape = exif_size(im)  # image size
+                    segments = []  # instance segments
+                    assert (shape[0] > 9) & (shape[1] > 9), f'image size {shape} <10 pixels'
+                    assert im.format.lower() in img_formats, f'invalid image format {im.format}'
 
                 # verify labels
                 if os.path.isfile(lb_file):
