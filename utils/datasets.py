@@ -1066,6 +1066,19 @@ def letterbox(img, new_shape=(640, 640), color=(114, 114, 114, 114, 114), auto=T
     dh /= 2
 
     if shape[::-1] != new_unpad:  # resize
+        if img.ndim == 3 and img.shape[2] == 5:
+            img = np.stack(
+                [
+                    cv2.resize(
+                        img[:,:,i],
+                        new_unpad,
+                        interpolation = cv2.INTER_LINEAR
+                    )
+                    for i in range (5)
+                ],
+                axis=2
+            )
+    else:   
         img = cv2.resize(img, new_unpad, interpolation=cv2.INTER_LINEAR)
     top, bottom = int(round(dh - 0.1)), int(round(dh + 0.1))
     left, right = int(round(dw - 0.1)), int(round(dw + 0.1))
