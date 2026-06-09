@@ -680,34 +680,62 @@ class LoadImagesAndLabels(Dataset):  # for training/testing
 
 # Ancillary functions --------------------------------------------------------------------------------------------------
 def load_image(self, index):
-    # loads 1 image from dataset, returns img, original hw, resized hw
+
     img = self.imgs[index]
-    if img is None:  # not cached
+
+    if img is None:
+
         path = self.img_files[index]
-        img = np.load(path)  # BGR
-        assert img.shape[2]==5
-        h0, w0 = img.shape[:2]  # orig hw
-        r = self.img_size / max(h0, w0)  # resize image to img_size
-        if r != 1:  # always resize down, only resize up if training with augmentation
+
+
+        if path.endswith(".npy"):
+
+            img = np.load(path)
+
+        else:
+
+            img = cv2.imread(path)
+
+
+        assert img is not None
+
+
+        h0, w0 = img.shape[:2]
+
+
+        r = self.img_size / max(h0, w0)
+
+
+        if r != 1:
+
             interp = cv2.INTER_AREA if r < 1 and not self.augment else cv2.INTER_LINEAR
-            if img.shape[2] == 5:
-                channels = []
-                for c in range (5):
-                    resized = cv2.resize(
-                        img[:,:,:c],
-                        (int(w0 * r),int (h0 * r)),
-                        interpolation = interp
-                    )
-                    channels.append(resized)
+
+
+            if img.ndim == 3 and img.shape[2] == 5:
+
                 img = np.stack(
-                    channels,
-                    axis = 2
+                    [
+                        cv2.resize(
+                            img[:, :, i],
+                            (int(w0*r), int(h0*r)),
+                            interpolation=interp
+                        )
+
+                        for i in range(5)
+                    ],
+                    axis=2
                 )
-        else:
-            img = cv2.resize(img, (int(w0 * r), int(h0 * r)), interpolation=interp)
-            return img, (h0, w0), img.shape[:2]  # img, hw_original, hw_resized
-        else:
-            return self.imgs[index], self.img_hw0[index], self.img_hw[index]  # img, hw_original, hw_resized
+
+            else:
+
+                img = cv2.resize(
+                    img,
+                    (int(w0*r), int(h0*r)),
+                    interpolation=interp
+                )
+
+
+        return img, (h0,w0), img.shape[:2]
 
 
 def augment_hsv(img, hgain=0.5, sgain=0.5, vgain=0.5):
