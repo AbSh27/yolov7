@@ -479,6 +479,8 @@ class LoadImagesAndLabels(Dataset):  # for training/testing
                 # verify images
                 if im_file.endswith(".npy"):
                     im = np.load(im_file)
+                    print ("NPY FOUND:",im_file)
+                    print ("shape:",im.shape)
                     assert im.ndim == 3, \
                         f"invalid npy shape {im.shape}"
                     assert im.shape[2] == 5, \
