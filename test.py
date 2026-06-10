@@ -163,7 +163,7 @@ def test(data,
                     vis_img = img[si]
                     if vis_img.shape[0] > 3:
                         vis_img = vis_img[:3,:,:]
-                    wandb_images.append(wandb_logger.wandb.Image(img[si], boxes=boxes, caption=path.name))
+                    wandb_images.append(wandb_logger.wandb.Image(vis_img, boxes=boxes, caption=path.name))
             wandb_logger.log_training_progress(predn, path, names) if wandb_logger and wandb_logger.wandb_run else None
 
             # Append to pycocotools JSON dictionary
