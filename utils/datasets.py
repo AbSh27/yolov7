@@ -476,6 +476,7 @@ class LoadImagesAndLabels(Dataset):  # for training/testing
         pbar = tqdm(zip(self.img_files, self.label_files), desc='Scanning images', total=len(self.img_files))
         for i, (im_file, lb_file) in enumerate(pbar):
             try:
+                segments = [] 
                 # verify images
                 if im_file.endswith(".npy"):
                     im = np.load(im_file)
@@ -493,7 +494,7 @@ class LoadImagesAndLabels(Dataset):  # for training/testing
                     im = Image.open(im_file)
                     im.verify()  # PIL verify
                     shape = exif_size(im)  # image size
-                    segments = []  # instance segments
+                    
                     assert (shape[0] > 9) & (shape[1] > 9), f'image size {shape} <10 pixels'
                     assert im.format.lower() in img_formats, f'invalid image format {im.format}'
 
