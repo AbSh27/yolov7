@@ -160,6 +160,9 @@ def test(data,
                                  "scores": {"class_score": conf},
                                  "domain": "pixel"} for *xyxy, conf, cls in pred.tolist()]
                     boxes = {"predictions": {"box_data": box_data, "class_labels": names}}  # inference-space
+                    vis_img = img[si]
+                    if vis_img.shape[0] > 3:
+                        vis_img = vis_img[:3,:,:]
                     wandb_images.append(wandb_logger.wandb.Image(img[si], boxes=boxes, caption=path.name))
             wandb_logger.log_training_progress(predn, path, names) if wandb_logger and wandb_logger.wandb_run else None
 
